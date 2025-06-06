@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CarModelController;
 use App\Http\Controllers\ManufacturerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
@@ -42,6 +43,9 @@ Route::get('/list-manufacturers', [ManufacturerController::class, 'index']);
 // list brands
 Route::get('/list-brands', [BrandController::class, 'index']);
 
+// list brands
+Route::get('/list-cars-models', [CarModelController::class, 'index']);
+
 // list pricing
 Route::get('/list-prices', [PricingController::class, 'index']);
 
@@ -74,6 +78,9 @@ Route::middleware('auth:sanctum')->group(callback: function () {
 
     //***************************** BRANDS MANAGEMENT ************************* */
     Route::apiResource('/brands', BrandController::class);
+
+    //***************************** BRANDS MANAGEMENT ************************* */
+    Route::apiResource('/car-models', CarModelController::class);
 
     //***************************** PRICING MANAGEMENT ************************* */
     Route::apiResource('/pricing', PricingController::class);

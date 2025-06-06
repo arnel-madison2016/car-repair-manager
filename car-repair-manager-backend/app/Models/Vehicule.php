@@ -8,7 +8,7 @@ class Vehicule extends Model {
 
     protected $fillable = [
         'customer_id',
-        'brand_id',
+        'car_model_id',
         'vehicle_type',
         'license_plate',
         'chassis_number',
@@ -20,7 +20,7 @@ class Vehicule extends Model {
         'url_pictures',
     ];
 
-    public function brand() {
+    public function car_model() {
 
         return $this->belongsTo(Brand::class, 'brand_id');
     }

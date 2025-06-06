@@ -9,7 +9,6 @@ class Manufacturer extends Model {
     protected $fillable = [
         'name',
         'country',
-        'url_picture',
     ];
 
     public function brands() {

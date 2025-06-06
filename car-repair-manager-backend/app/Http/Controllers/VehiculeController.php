@@ -24,7 +24,7 @@ class VehiculeController extends Controller {
             $user = User::find($session_infos->id);
 
             // check if it's admin role ?
-            if (!$user->hasRole('admin')) {
+            if (!$user->hasAnyRole(['admin', 'client'])) {
                 // unauthorized action
                 return response()->json([
                     'status' => 403,
@@ -34,7 +34,7 @@ class VehiculeController extends Controller {
             }
 
             // list vehicules
-            $vehicules = Vehicule::with('customer')->get();
+            $vehicules = Vehicule::with(['customer', 'car_model'])->get();
 
             return response()->json([
                 'status' => 200,
@@ -85,11 +85,10 @@ class VehiculeController extends Controller {
                     // ------------- vehicule ------------------
                     'license_plate' => 'required|string|max:150|unique:vehicules,license_plate',
                     'chassis_number' => 'required|string|max:150',
-                    'brand_id' => 'required|numeric',
+                    'car_model_id' => 'required|numeric',
                     'odometer_reading' => 'required|string|max:50',
                     'year_registration' => 'required|string|max:4',
                     'fuel_type' => 'required|string|max:50',
-                    'vehicle_type' => 'required|string|max:50',
                     'gear_box' => 'required|string|max:50',
                     'engine_size' => 'required|string|max:50',    
                     'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',            
@@ -108,13 +107,12 @@ class VehiculeController extends Controller {
 
                 // storing vehicule datas in to db
                 $vehicule = $customer->vehicules()->create([
-                    'brand_id' => $request->brand_id,
+                    'car_model_id' => $request->car_model_id,
                     'license_plate' => $request->licence_plate,
                     'chassis_number' => $request->chassis_number,
                     'odometer_reading' => $request->odometer_reading,
                     'year_registration' => $request->year_registration,
                     'fuel_type' => $request->fuel_type,
-                    'vehicle_type' => $request->vehicle_type,
                     'gear_box' => $request->gear_box,
                     'engine_size' => $request->engine_size,
                     'url_pictures' => $filePath
@@ -124,7 +122,19 @@ class VehiculeController extends Controller {
                     'status' => 200,
                     'vehicule' => $vehicule,
                 ]);
+            }else{
+                return response()->json([
+                    'status' => 403,
+                    'massage' => 'This vehicle already exists.',
+                ]);
             }
+        }else{
+
+            // unauthorized action
+            return response()->json([
+                'status' => 404,
+                'message' => 'You should first loggin.',
+            ]);
         }
     }
 
@@ -141,10 +151,10 @@ class VehiculeController extends Controller {
             $user = User::find($session_infos->id);
 
             // get vehicule datas
-            $vehicle = Vehicule::with(['brand', 'customer'])->findOrFail($id);
+            $vehicule = Vehicule::with(['car_model', 'customer'])->findOrFail($id);
 
             // check if it's admin or client role and it's the owner ?
-            if (!$user->hasAnyRole(['admin','client']) || $user->id !== $vehicle->customer->user_id) {
+            if (!$user->hasAnyRole(['admin','client']) || $user->id !== $vehicule->customer->user_id) {
                 // unauthorized action
                 return response()->json([
                     'status' => 403,
@@ -154,7 +164,7 @@ class VehiculeController extends Controller {
 
             return response()->json([
                 'status' => 200,
-                'vehicule' => $vehicle,
+                'vehicule' => $vehicule,
             ]);
 
         }else{
@@ -180,10 +190,10 @@ class VehiculeController extends Controller {
             $user = User::find($session_infos->id);
 
             // get vehicule datas
-            $vehicle = Vehicule::with(['brand', 'customer'])->findOrFail($id);
+            $vehicule = Vehicule::with(['car_model', 'customer'])->findOrFail($id);
 
             // check if it's admin or client role and it's the owner ?
-            if (!$user->hasAnyRole(['admin','client']) || $user->id !== $vehicle->customer->user_id) {
+            if (!$user->hasAnyRole(['admin','client']) || $user->id !== $vehicule->customer->user_id) {
                 // unauthorized action
                 return response()->json([
                     'status' => 403,
@@ -196,11 +206,10 @@ class VehiculeController extends Controller {
                 // ------------- vehicule ------------------
                 'license_plate' => 'required|string|max:150',
                 'chassis_number' => 'required|string|max:150',
-                'brand_id' => 'required|numeric',
+                'car_model_id' => 'required|numeric',
                 'odometer_reading' => 'required|string|max:50',
                 'year_registration' => 'required|string|max:4',
                 'fuel_type' => 'required|string|max:50',
-                'vehicle_type' => 'required|string|max:50',
                 'gear_box' => 'required|string|max:50',
                 'engine_size' => 'required|string|max:50',    
                 //'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',            
@@ -209,9 +218,9 @@ class VehiculeController extends Controller {
             // manage images
             if($request->hasFile('image')){
 
-                if($vehicle){
+                if($vehicule){
                     // delete the old image in path: /public/images/vehicules
-                    Storage::disk('public')->delete($vehicle->url_pictures);
+                    Storage::disk('public')->delete($vehicule->url_pictures);
                 }            
 
                 // get image details
@@ -223,15 +232,14 @@ class VehiculeController extends Controller {
             }
 
             // storing vehicule datas in to db
-            $vehicle->update([
+            $vehicule->update([
                 'customer_id' => $request->customer_id,
-                'brand_id' => $request->brand_id,
+                'car_model_id' => $request->car_model_id,
                 'license_plate' => $request->licence_plate,
                 'chassis_number' => $request->chassis_number,
                 'odometer_reading' => $request->odometer_reading,
                 'year_registration' => $request->year_registration,
                 'fuel_type' => $request->fuel_type,
-                'vehicle_type' => $request->vehicle_type,
                 'gear_box' => $request->gear_box,
                 'engine_size' => $request->engine_size,
                 'url_pictures' => $filePath
@@ -239,7 +247,7 @@ class VehiculeController extends Controller {
 
             return response()->json([
                 'status' => 200,
-                'vehicule' => $vehicle,
+                'vehicule' => $vehicule,
             ]);
 
         }else{
@@ -274,19 +282,19 @@ class VehiculeController extends Controller {
             }
 
             // found the record to destroy
-            $vehicle = Vehicule::find($id);
+            $vehicule = Vehicule::find($id);
 
-            if($vehicle){
+            if($vehicule){
 
                 // delete physically vehicle image
-                if($vehicle->url_pictures){
+                if($vehicule->url_pictures){
 
                     // delete the old image in path: /public/images/vehicules
-                    Storage::disk('public')->delete($vehicle->url_pictures);
+                    Storage::disk('public')->delete($vehicule->url_pictures);
                 }
 
                 // delete the record in the database
-                $vehicle->delete();
+                $vehicule->delete();
 
                 return [
                     'status' => 201,

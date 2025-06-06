@@ -6,6 +6,8 @@ use App\Models\Brand;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 
 class BrandController extends Controller {
@@ -37,12 +39,26 @@ class BrandController extends Controller {
                 // validate datas
                 $validated = $request->validate([
                     'name' => 'required|string|max:255|unique:brands,name',
+                    'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
                 ]);
+
+                // manage images
+                if($request->hasFile('image')){
+
+                    // get image details
+                    $file = $request->file('image');
+                    $name = rand(100, 9999) . time() . '_' . $file->getClientOriginalName();
+                    $fileName = Str::slug($name);
+
+                    // path where to store image "storage/app/public/images/brands"
+                    $filePath = $file->storeAs('images/brands', $fileName, 'public');
+                }
                 
                 // storing the datas in to db
                 $brand = Brand::create([
                     'name' => $request->name,
-                    'manufacturer_id' => $request->manufacturer_id
+                    'manufacturer_id' => $request->manufacturer_id,
+                    'url-picture' => $filePath,
                 ]);
 
                 return response()->json([
@@ -81,15 +97,34 @@ class BrandController extends Controller {
                 // validate datas
                 $validated = $request->validate([
                     'name' => 'required|string|max:255|unique:brands,name',
+                    'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
                 ]);
                 
                 // found the record to update
                 $brand = Brand::find($id);
 
+                // manage images
+                if($request->hasFile('image')){
+
+                    if($brand){
+                        // delete the old image in path: /public/images/manufacturers
+                        Storage::disk('public')->delete($brand->url_picture);
+                    }            
+
+                    // get image details
+                    $file = $request->file('image');
+                    $name = rand(100, 9999) . time() . '_' . $file->getClientOriginalName();
+                    $fileName = Str::slug($name);
+
+                    // path where to store image "storage/app/public/images/brands"
+                    $filePath = $file->storeAs('images/brands', $fileName, 'public');
+                }
+
                 // update record
                 if($brand){            
                     $brand->update([
                         'name' => $request->name,
+                        'url_picture' => $filePath,
                         'manufacturer_id' => $request->manufacturer_id
                     ]);
 
@@ -117,10 +152,12 @@ class BrandController extends Controller {
             // check if it's admin or manager role ?
             if ($user->hasRole('admin')) {
 
-                // found the record to update
+                // found the record to delete
                 $brand = Brand::find($id);                
 
                 if($brand){
+                    // delete the old image in path: /public/images/brands
+                    Storage::disk('public')->delete($brand->url_picture);
 
                     $label = $brand->name;
 

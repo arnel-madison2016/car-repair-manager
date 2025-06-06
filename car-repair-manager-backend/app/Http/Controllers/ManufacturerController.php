@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Manufacturer;
 use App\Models\User;
 
@@ -37,27 +36,14 @@ class ManufacturerController extends Controller {
 
                 // validate datas
                 $request->validate([
-                    'name' => 'required|string|max:255|unique:manufacturers,name',
-                    'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                    'name' => 'required|string|max:255|unique:manufacturers,name',                    
                     'country' => 'required'
-                ]);
-
-                // manage images
-                if($request->hasFile('image')){
-
-                    // get image details
-                    $file = $request->file('image');
-                    $fileName = rand(100, 9999) . time() . '_' . $file->getClientOriginalName();
-
-                    // path where to store image "storage/app/public/images/manufacturers"
-                    $filePath = $file->storeAs('images/manufacturers', $fileName, 'public');
-                }
+                ]);                
 
                 // storing the datas in to db
                 $manufacturer = Manufacturer::create([
                     'name' => $request->name,
                     'country' => $request->country,
-                    'url_picture' => $filePath
                 ]);
 
                 return response()->json([
@@ -101,27 +87,10 @@ class ManufacturerController extends Controller {
 
                 // validate datas
                 $request->validate([
-                    'name' => 'required|string|max:255|unique:car_manufacturers,name',
-                    'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                    'name' => 'required|string|max:255|unique:car_manufacturers,name',                    
                     'country' => 'required'
                 ]);       
-                
-                // manage images
-                if($request->hasFile('image')){
-
-                    if($manufacturer){
-                        // delete the old image in path: /public/images/manufacturers
-                        Storage::disk('public')->delete($manufacturer->url_picture);
-                    }            
-
-                    // get image details
-                    $file = $request->file('image');
-                    $fileName = rand(100, 9999) . time() . '_' . $file->getClientOriginalName();
-
-                    // path where to store image "storage/app/public/images/manufacturers"
-                    $filePath = $file->storeAs('images/manufacturers', $fileName, 'public');
-                }
-
+                                
                 // update record
                 $manufacturer->update([
                     'name' => $request->name,
@@ -156,8 +125,6 @@ class ManufacturerController extends Controller {
                 $manufacturer = Manufacturer::find($id);
 
                 if($manufacturer){
-                    // delete the old image in path: /public/images/manufacturers
-                    Storage::disk('public')->delete($manufacturer->url_picture);
 
                     // delete the record in the database
                     $manufacturer->delete();
