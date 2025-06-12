@@ -111,50 +111,55 @@ class CustomerController extends Controller {
             $subject = 'verify email';       // form to show
 
             // send email verification link
-            Mail::to($user->email)->send(new VerifyEmail($user, $verify_otp, $action, $subject));
-
+            Mail::to($user->email)->send(new VerifyEmail($user, $verify_otp, $action, $subject));       
+        
             // --------------------- Customer registration logic ---------------
-            // manage images
-            if($request->hasFile('image')){
-
-                // get image details
-                $file = $request->file('image');
-                $fileName = rand(100, 9999) . time() . '_' . $file->getClientOriginalName();
-
-                // path where to store image "storage/app/public/images/customers"
-                $filePath = $file->storeAs('images/customers', $fileName, 'public');
-            }
             
-            // storing customer in to db
-            $customer = Customer::create([
-                'user_id' => $request->user_id,
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'gender' => $request->gender,
-                'email' => $request->email,
-                'adresse' => $request->adresse,
-                'postal_code' => $request->postal_code,
-                'phone' => $request->phone,
-                'country' => $request->country,
-                'city' => $request->city,
-                'profession' => $request->profession,
-                'company_name' => $request->company_name,
-                'url_photo' => $filePath,
-            ]);
+            // customer already exists ?
+            $customer = Customer::where('email', $request->email)->firstOrFail();
 
-            return response()->json([
-                'status' => 201,
-                'customer' => $customer,
-                'token' => $token->plainTextToken,
-            ]);
+            if(!$customer){
 
-        }else{
+                // manage images
+                if($request->hasFile('image')){
 
-            // customer already exists
-            return response()->json([
-                'status' => 301,
-                'message' => ucwords($request->first_name) . '' . ucwords($request->last_name) . ' already exists',
-            ]);
+                    // get image details
+                    $file = $request->file('image');
+                    $fileName = rand(100, 9999) . time() . '_' . $file->getClientOriginalName();
+
+                    // path where to store image "storage/app/public/images/customers"
+                    $filePath = $file->storeAs('images/customers', $fileName, 'public');
+                }
+
+                // storing customer in to db
+                $customer->create([
+                    'user_id' => $request->user_id,
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'gender' => $request->gender,
+                    'email' => $request->email,
+                    'adresse' => $request->adresse,
+                    'postal_code' => $request->postal_code,
+                    'phone' => $request->phone,
+                    'country' => $request->country,
+                    'city' => $request->city,
+                    'profession' => $request->profession,
+                    'company_name' => $request->company_name,
+                    'url_photo' => $filePath,
+                ]);
+
+                return response()->json([
+                    'customer' => $customer,
+                    'message' => 'Dear '. ucwords($request->first_name) . '' . ucwords($request->last_name) .', Please check your inbox to activate your account.',
+                ], 201);
+                
+            }else{
+
+                // customer already exists
+                return response()->json([
+                    'message' => ucwords($request->first_name) . '' . ucwords($request->last_name) . ' already exists',
+                ], 422);
+            }
         }
     }
 

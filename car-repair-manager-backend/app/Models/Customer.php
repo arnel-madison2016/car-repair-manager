@@ -34,4 +34,9 @@ class Customer extends Model {
         return $this->hasMany(Vehicule::class);
     }
 
+    public function appointments() {
+
+        return $this->hasMany(Appointment::class);
+    }
+
 }

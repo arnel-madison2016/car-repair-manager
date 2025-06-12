@@ -30,4 +30,9 @@ class Vehicule extends Model {
         // a vehicle belongs to a special customer
         return $this->belongsTo(Customer::class, 'customer_id');
     }
+
+    public function appointments() {
+
+        return $this->hasMany(Appointment::class);
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CarModelController;
@@ -90,6 +91,9 @@ Route::middleware('auth:sanctum')->group(callback: function () {
 
     //***************************** VEHICULES MANAGEMENT ************************* */
     Route::apiResource('/vehicules', VehiculeController::class);
+
+    //***************************** APPOINTMENTS MANAGEMENT ************************* */
+    Route::apiResource('/appointments', AppointmentController::class);
 
     //***************************** PARAMETERS MANAGEMENT ************************* */
     Route::apiResource('/parameters', ParameterController::class);
