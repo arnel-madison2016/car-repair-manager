@@ -8,6 +8,7 @@ use App\Http\Controllers\ManufacturerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\HandlingAppointmentController;
 use App\Http\Controllers\ParameterController;
 use App\Http\Controllers\PricingController;
 use App\Http\Controllers\ServiceController;
@@ -94,7 +95,8 @@ Route::middleware('auth:sanctum')->group(callback: function () {
 
     //***************************** APPOINTMENTS MANAGEMENT ************************* */
     Route::apiResource('/appointments', AppointmentController::class);
-
+    Route::post('/handle-appointment/{id}', [HandlingAppointmentController::class, 'handleAppointment']);
+    
     //***************************** PARAMETERS MANAGEMENT ************************* */
     Route::apiResource('/parameters', ParameterController::class);
 
