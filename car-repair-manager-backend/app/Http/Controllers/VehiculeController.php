@@ -132,9 +132,8 @@ class VehiculeController extends Controller {
 
             // unauthorized action
             return response()->json([
-                'status' => 404,
                 'message' => 'You should first loggin.',
-            ]);
+            ], 404);
         }
     }
 

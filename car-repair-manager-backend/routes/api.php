@@ -11,7 +11,9 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HandlingAppointmentController;
 use App\Http\Controllers\ParameterController;
 use App\Http\Controllers\PricingController;
+use App\Http\Controllers\RepairSheetController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\VehiculeController;
 use App\Models\Brand;
 use App\Models\Category;
@@ -96,7 +98,13 @@ Route::middleware('auth:sanctum')->group(callback: function () {
     //***************************** APPOINTMENTS MANAGEMENT ************************* */
     Route::apiResource('/appointments', AppointmentController::class);
     Route::post('/handle-appointment/{id}', [HandlingAppointmentController::class, 'handleAppointment']);
-    
+   
+    //***************************** REPAIR SHEETS MANAGEMENT ************************* */
+    Route::apiResource('/repairsheets', RepairSheetController::class);
+
+    //***************************** TASKS MANAGEMENT ************************* */
+    Route::apiResource('/tasks', TaskController::class);
+
     //***************************** PARAMETERS MANAGEMENT ************************* */
     Route::apiResource('/parameters', ParameterController::class);
 
