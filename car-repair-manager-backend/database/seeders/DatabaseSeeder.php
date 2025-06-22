@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
             // CategorySeeder::class,
             // ServiceSeeder::class,
             // ManufacturerAndBrandSeeder::class,
-            CarModelSeeder::class,
+            // CarModelSeeder::class,
+            GrilleTarifaireSeeder::class,
         ]);
 
         // User::factory(10)->create();

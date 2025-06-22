@@ -20,6 +20,7 @@ use App\Models\Category;
 use App\Models\Manufacturer;
 use App\Models\Pricing;
 use App\Models\Service;
+use App\Models\Taxation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -104,6 +105,9 @@ Route::middleware('auth:sanctum')->group(callback: function () {
 
     //***************************** TASKS MANAGEMENT ************************* */
     Route::apiResource('/tasks', TaskController::class);
+
+    //***************************** TAXATIONS MANAGEMENT ************************* */
+    Route::apiResource('/taxation', Taxation::class);
 
     //***************************** PARAMETERS MANAGEMENT ************************* */
     Route::apiResource('/parameters', ParameterController::class);

@@ -19,6 +19,16 @@ class Service extends Model {
 
     public function prices() {
 
-        return $this->has(Pricing::class);
+       return $this->has(Pricing::class);
+    }
+
+    public function taxations() {
+
+        return $this->hasMany(Taxation::class);
+    }
+
+    public function tasks() {
+
+        return $this->hasMany(Task::class);
     }
 }
