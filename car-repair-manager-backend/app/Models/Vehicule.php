@@ -22,7 +22,7 @@ class Vehicule extends Model {
 
     public function car_model() {
 
-        return $this->belongsTo(Brand::class, 'brand_id');
+        return $this->belongsTo(CarModel::class, 'car_model_id');
     }
 
     public function customer() {

@@ -98,8 +98,9 @@ Route::middleware('auth:sanctum')->group(callback: function () {
 
     //***************************** APPOINTMENTS MANAGEMENT ************************* */
     Route::apiResource('/appointments', AppointmentController::class);
+    
     Route::post('/handle-appointment/{id}', [HandlingAppointmentController::class, 'handleAppointment']);
-   
+  
     //***************************** REPAIR SHEETS MANAGEMENT ************************* */
     Route::apiResource('/repairsheets', RepairSheetController::class);
 
@@ -113,7 +114,6 @@ Route::middleware('auth:sanctum')->group(callback: function () {
     Route::apiResource('/parameters', ParameterController::class);
 
 });
-
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //    return $request->user();
 // });

@@ -75,8 +75,8 @@ class CustomerController extends Controller {
             'phone' => 'required|string|max:50', 
             'country' => 'required|string|max:50',
             'city' => 'required|string|max:50',           
-            'company_name' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',            
+            'company_name' => 'sometimes|string|max:255',
+            'image_principale' => 'sometimes|image|mimes:jpeg,png,jpg|max:2048',            
         ]);
 
         // save first user credentials
@@ -114,17 +114,17 @@ class CustomerController extends Controller {
             Mail::to($user->email)->send(new VerifyEmail($user, $verify_otp, $action, $subject));       
         
             // --------------------- Customer registration logic ---------------
-            
+           
             // customer already exists ?
-            $customer = Customer::where('email', $request->email)->firstOrFail();
+            $client = Customer::where('email', $request->email)->first();
 
-            if(!$customer){
+            if(!$client){
 
                 // manage images
-                if($request->hasFile('image')){
+                if($request->hasFile('image_principale')){
 
                     // get image details
-                    $file = $request->file('image');
+                    $file = $request->file('image_principale');
                     $fileName = rand(100, 9999) . time() . '_' . $file->getClientOriginalName();
 
                     // path where to store image "storage/app/public/images/customers"
@@ -132,8 +132,7 @@ class CustomerController extends Controller {
                 }
 
                 // storing customer in to db
-                $customer->create([
-                    'user_id' => $request->user_id,
+                $customer = $user->customer()->create([
                     'first_name' => $request->first_name,
                     'last_name' => $request->last_name,
                     'gender' => $request->gender,
@@ -236,7 +235,7 @@ class CustomerController extends Controller {
                 $customer = Customer::find($id);
 
                 // manage images
-                if($request->hasFile('image')){
+                if($request->hasFile('image_principale')){
 
                     if($customer){
                         // delete the old image in path: /public/images/customers
@@ -244,7 +243,7 @@ class CustomerController extends Controller {
                     }            
 
                     // get image details
-                    $file = $request->file('image');
+                    $file = $request->file('image_principale');
                     $fileName = rand(100, 9999) . time() . '_' . $file->getClientOriginalName();
 
                     // path where to store image "storage/app/public/images/customers"

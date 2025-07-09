@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Customer extends Model {
 
     use HasFactory;
-   
+  
     protected $fillable = [
         'first_name',
         'last_name',
@@ -37,6 +37,11 @@ class Customer extends Model {
     public function appointments() {
 
         return $this->hasMany(Appointment::class);
+    }
+
+    public function getFullNameAttribute(): string {
+
+        return "{$this->first_name} {$this->last_name}";
     }
 
 }

@@ -254,10 +254,19 @@ class AuthController extends Controller {
     // logic to logg-out
     public function logout(Request $request){
 
-        $request->user()->tokens()->delete();
+        // current user is connected ?
+        if(Auth::check()){
+            
+            // get datas
+            $session_infos = Auth::user();
+            $user = User::find($session_infos->id);
 
-        return response()->json([
-            'message' => "You are logged out."
-        ], 200);
+            // logout procedure
+            $user->tokens()->delete();
+
+            return response()->json([
+                'message' => "You are logged out."
+            ], 200);
+        }        
     }
 }

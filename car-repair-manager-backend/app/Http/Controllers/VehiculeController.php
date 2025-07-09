@@ -67,7 +67,7 @@ class VehiculeController extends Controller {
             $customer = Customer::find($request->customer_id);
 
             // check if it's admin role ?
-            if (!$user->hasRole('client') || $user->id !== $customer->user_id) {
+            if (!$user->hasRole('client') || $user->id !== $user->customer->user_id) {
                 // unauthorized action
                 return response()->json([
                     'status' => 403,
@@ -75,24 +75,24 @@ class VehiculeController extends Controller {
                 ]);
             }
 
+            // validate vehicule datas
+            $request->validate([
+                // ------------- vehicule ------------------
+                'license_plate' => 'required|string|max:150|unique:vehicules,license_plate',
+                'chassis_number' => 'required|string|max:150',
+                'car_model_id' => 'required|numeric',
+                'odometer_reading' => 'required|string|max:50',
+                'year_registration' => 'required|string|max:4',
+                'fuel_type' => 'required|string|max:50',
+                'gear_box' => 'required|string|max:50',
+                'engine_size' => 'required|string|max:50',    
+                'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',            
+            ]);
+
             // vehicle already exists ?
-            $vehicule = Vehicule::where('chassis_number', $request->chassis_number)->first(); 
+            $vehicule = Vehicule::where('license_plate', $request->license_plate)->first(); 
 
             if(!$vehicule){
-
-                // validate vehicule datas
-                $request->validate([
-                    // ------------- vehicule ------------------
-                    'license_plate' => 'required|string|max:150|unique:vehicules,license_plate',
-                    'chassis_number' => 'required|string|max:150',
-                    'car_model_id' => 'required|numeric',
-                    'odometer_reading' => 'required|string|max:50',
-                    'year_registration' => 'required|string|max:4',
-                    'fuel_type' => 'required|string|max:50',
-                    'gear_box' => 'required|string|max:50',
-                    'engine_size' => 'required|string|max:50',    
-                    'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',            
-                ]);
 
                 // manage vehicule images
                 if($request->hasFile('image')){
@@ -106,9 +106,10 @@ class VehiculeController extends Controller {
                 }
 
                 // storing vehicule datas in to db
-                $vehicule = $customer->vehicules()->create([
+                $car = $vehicule->create([
+                    'customer_id' => $customer->id,
                     'car_model_id' => $request->car_model_id,
-                    'license_plate' => $request->licence_plate,
+                    'license_plate' => $request->license_plate,
                     'chassis_number' => $request->chassis_number,
                     'odometer_reading' => $request->odometer_reading,
                     'year_registration' => $request->year_registration,
@@ -120,7 +121,7 @@ class VehiculeController extends Controller {
                 
                 return response()->json([
                     'status' => 200,
-                    'vehicule' => $vehicule,
+                    'vehicule' => $car,
                 ]);
             }else{
                 return response()->json([
@@ -215,7 +216,7 @@ class VehiculeController extends Controller {
             ]);
 
             // manage images
-            if($request->hasFile('image')){
+            if($request->hasFile('image_secondaire')){
 
                 if($vehicule){
                     // delete the old image in path: /public/images/vehicules
@@ -223,7 +224,7 @@ class VehiculeController extends Controller {
                 }            
 
                 // get image details
-                $file = $request->file('image');
+                $file = $request->file('image_secondaire');
                 $fileName = rand(100, 9999) . time() . '_' . $file->getClientOriginalName();
 
                 // path where to store image "storage/app/public/images/vehicules"
