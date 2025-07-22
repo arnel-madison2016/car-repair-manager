@@ -36,6 +36,7 @@ class AuthController extends Controller {
                 'password' => $password,
                 'password_reset_code' => $password_reset_code,
                 'verify_otp' => $verify_otp,
+                'is_active' => 1,
             ];
 
             // create user account
@@ -51,18 +52,16 @@ class AuthController extends Controller {
             // send email verification link
             Mail::to($user->email)->send(new VerifyEmail($user, $verify_otp, $action, $subject));
 
-            return [
-                'status' => 201,
+            return response()->json([
                 'user' => $user,
                 'token' => $token->plainTextToken
-            ];
+            ], 201);
 
         }else{
 
-            return [
-                'status' => 409,
+            return response()->json([
                 'message' => 'Account already exists. Please logg-in'
-            ];
+            ], 409);
         }        
     }
 
@@ -75,7 +74,8 @@ class AuthController extends Controller {
             "password" => "required",
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)
+                    ->where('is_active', 1)->first();
 
         if($user){
 
@@ -88,35 +88,32 @@ class AuthController extends Controller {
                     // Provided credentials are correct
                     $token = $user->createToken('auth_token')->plainTextToken;
 
-                    return [
+                    return response()->json([
                         'status' => 200,
                         'auth_token' => $token,
                         'user' => $user,
-                    ];
+                    ], 200);
 
                 } else {
 
                     // uncorrect credentials
-                    return [
-                        'status' => 401,
+                    return response()->json([
                         'message' => 'The provided credentials are incorrect. Please try again !',
-                    ];
+                    ], 401);
                 }
             }else{
 
                 // unverify account
                 return response()->json([
-                    'status' => 403,
                     'message' => 'Check your email address first, to verify your account before logg-in.'
-                ]);
+                ], 403);
             }
         }else{
             
             // user not found
-            return [
-                'status' => 404,
+            return response()->json([
                 'message' => 'user account not found !',
-            ];
+            ], 404);
         }        
     }
 
@@ -141,19 +138,17 @@ class AuthController extends Controller {
             // send email to the user
             Mail::to($user->email)->send(new VerifyEmail($user, $password_reset_code, $action, $subject));
 
-            return [
-                'status' => 200,
+            return response()->json([
                 'user' => $user,
                 'message' => 'The password reset code has been sent. Please, check to your email address.'
-            ];
+            ], 200);
             
         }else{
 
             // user not found
-            return [
-                'status' => 401,
+            return response()->json([
                 'message' => 'Unauthorized, you must first log in.'
-            ];
+            ], 401);
         }
     }
 
@@ -167,16 +162,14 @@ class AuthController extends Controller {
             $user->verify_otp = ""; // delete the verify_otp after email vérification
             $user->save();
 
-            return [
-                'status' => 200,
+            return response()->json([
                 'user' => $user,
                 'message' => 'Email address verified successfully.'
-            ];
+            ], 200);
         }else{
-            return [
-                'status' => 404,
+            return response()->json([
                 'message' => 'Invalid verification Code.'
-            ];
+            ], 404);
         }
     }
 
@@ -200,17 +193,15 @@ class AuthController extends Controller {
             // resend verification email
             Mail::to($user->email)->send(new VerifyEmail($user, $verify_otp, $action, $subject));
            
-            return [
-                'status' => 200,
+            return response()->json([
                 'user' => $user,
                 'message' => 'New verification email successfully sent.'
-            ];
+            ], 200);
             
         }else{
             return response()->json([
-                'status' => 500,
                 'message' => 'Unable to send a new verification email.'
-            ]);
+            ], 500);
         }
     }
 
@@ -241,39 +232,43 @@ class AuthController extends Controller {
                 // Revoke all user token
                 $user->tokens()->delete();
 
-                return [
-                    'status' => 200,
+                return response()->json([
                     'message' => 'Password successfully reset. You can now log in.'
-                ];
+                ], 200);
 
             }else{
 
                 // password reset code not matching
-                return [
-                    'status' => 422,
+                return response()->json([
                     'message' => 'Invalid credential.'
-                ];
+                ], 422);
             }
 
         }else{
 
             // no user connected
-            return [
-                'status' => 401,
+            return response()->json([
                 'message' => 'Unauthorized, you must first log in.'
-            ];
+            ], 401);
         }
     }
 
     // logic to logg-out
     public function logout(Request $request){
 
-        $request->user()->tokens()->delete();
+        // current user is connected ?
+        if(Auth::check()){
+            
+            // get datas
+            $session_infos = Auth::user();
+            $user = User::find($session_infos->id);
 
-        return [
-            'status' => 200,
-            'message' => "You are logged out."
-        ];
+            // logout procedure
+            $user->tokens()->delete();
+
+            return response()->json([
+                'message' => "You are logged out."
+            ], 200);
+        }        
     }
-    
 }
