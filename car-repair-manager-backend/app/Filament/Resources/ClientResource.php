@@ -32,7 +32,14 @@ class ClientResource extends Resource
     protected static ?string $model = Customer::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationGroup = 'Contacts Management';
+    public static function getNavigationBadge(): ?string {
 
+        return static::getModel()::count();        
+    }
+    public static function getNavigationBadgeColor(): string|array|null {
+        return 'info';
+    }
     public static function form(Form $form): Form {
         return $form
 

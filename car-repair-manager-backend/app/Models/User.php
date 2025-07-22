@@ -25,6 +25,7 @@ class User extends Authenticatable
         'password',
         'verify_otp',
         'password_reset_code',
+        'is_active',
     ];
 
     /**
@@ -47,6 +48,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -60,4 +62,13 @@ class User extends Authenticatable
         return $this->hasOne(Customer::class);
     }
 
+    public function tasks() {
+
+        return $this->hasMany(Task::class);
+    }
+
+    public function scopeMechanics($query) {
+        
+        return $query->role('mechanic'); // Récupère les utilisateurs ayant ce rôle
+    }
 }

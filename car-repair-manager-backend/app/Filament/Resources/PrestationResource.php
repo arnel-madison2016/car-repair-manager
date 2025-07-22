@@ -28,6 +28,11 @@ class PrestationResource extends Resource
     protected static ?string $model = Service::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    protected static ?string $navigationGroup = 'Services Management';
+    public static function getNavigationBadge(): ?string {
+
+        return static::getModel()::count();        
+    }
 
     public static function form(Form $form): Form
     {

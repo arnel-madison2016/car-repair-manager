@@ -35,4 +35,9 @@ class Vehicule extends Model {
 
         return $this->hasMany(Appointment::class);
     }
+
+    public function getDisplayNameAttribute() {
+
+        return "{$this->car_model->brand->name} {$this->car_model->name} ({$this->license_plate})";
+    }
 }

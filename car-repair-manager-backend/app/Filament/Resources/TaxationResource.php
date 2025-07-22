@@ -28,6 +28,12 @@ class TaxationResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-currency-euro';
 
+    protected static ?string $navigationGroup = 'Services Management';
+    public static function getNavigationBadge(): ?string {
+
+        return static::getModel()::count();        
+    }
+
     public static function form(Form $form): Form
     {
         return $form

@@ -11,6 +11,8 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.1",
         "laravel/tinker": "^2.10.1",
+        "livewire/livewire": "*",
+        "mews/purifier": "^3.4",
         "parfaitementweb/filament-country-field": "^2.5",
         "spatie/laravel-permission": "^6.17"
     },

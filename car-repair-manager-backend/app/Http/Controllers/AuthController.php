@@ -36,6 +36,7 @@ class AuthController extends Controller {
                 'password' => $password,
                 'password_reset_code' => $password_reset_code,
                 'verify_otp' => $verify_otp,
+                'is_active' => 1,
             ];
 
             // create user account
@@ -73,7 +74,8 @@ class AuthController extends Controller {
             "password" => "required",
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)
+                    ->where('is_active', 1)->first();
 
         if($user){
 

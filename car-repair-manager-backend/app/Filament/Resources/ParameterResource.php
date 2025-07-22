@@ -28,9 +28,9 @@ class ParameterResource extends Resource
     protected static ?string $model = Parameter::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-8-tooth';
+    protected static ?string $navigationGroup = 'Settings Management';
+    public static function form(Form $form): Form {
 
-    public static function form(Form $form): Form
-    {
         return $form
             ->schema([
                 

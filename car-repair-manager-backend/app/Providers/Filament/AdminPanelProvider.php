@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\RepairSheetResource\Widgets\RepairSheetStats as WidgetsRepairSheetStats;
+use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -10,7 +12,12 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+
 use Filament\Widgets;
+use App\Filament\Widgets\AppointmentStats;
+use App\Filament\Widgets\RepairSheetStats;
+//use App\Filament\Widgets\RepairSheetStatusTable;
+
 use Filament\Navigation\MenuItem;
 use Filament\Pages\Auth\EditProfile;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -30,9 +37,19 @@ class AdminPanelProvider extends PanelProvider {
             ->path('admin')
             ->login()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Indigo,
+                'secondary' => Color::Amber,
+                'danger' => Color::Red,
+                'info' => Color::Blue,
+                'success' => Color::Emerald,
+                'warning' => Color::Orange,
             ])
-            ->brandName('Cair-repair Admin Panel') // ou ton nom
+            ->font('Inter')
+            ->favicon('storage/images/mecatronik-logo.ico')
+            ->collapsibleNavigationGroups(false)
+            ->brandName('Car-repair Admin Panel') // ou ton nom
+            ->brandLogo(asset('storage/images/logos/mecatronik-logo.png'))
+            ->brandLogoHeight('4.5rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -42,17 +59,16 @@ class AdminPanelProvider extends PanelProvider {
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
+                AppointmentStats::class,
+                RepairSheetStats::class,
+                //RepairSheetStatusTable::class,
             ])
-            ->navigationGroups([
-                'Gestion',
-                'Configuration',
-            ])
-            ->userMenuItems([
-                MenuItem::make()
-                    ->label('Mon Profil')
-                    //->url(EditProfile::getUrl())
-                    ->icon('heroicon-o-user'),
-            ])            
+            ->navigationGroups([                
+                'Repair cars Management',
+                'Services Management',
+                'Contacts Management',
+                'Settings Management',
+            ])                      
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

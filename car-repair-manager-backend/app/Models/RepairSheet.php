@@ -14,6 +14,8 @@ class RepairSheet extends Model {
         'status'
     ];
 
+    protected $withCount = ['tasks'];
+    
     public function tasks() {
 
         return $this->hasMany(Task::class);

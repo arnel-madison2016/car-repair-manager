@@ -31,9 +31,16 @@ class AppointmentResource extends Resource
     protected static ?string $model = Appointment::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-date-range';
+    protected static ?string $navigationGroup = 'Repair cars Management';
+    public static function getNavigationBadge(): ?string {
 
-    public static function form(Form $form): Form
-    {
+        return static::getModel()::count();        
+    }
+    public static function getNavigationBadgeColor(): string|array|null {
+        return 'success';
+    }
+    public static function form(Form $form): Form {
+
         return $form
             ->schema([
                 //
